@@ -20,6 +20,7 @@ package eth
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/txannounce"
 	"math/big"
 	"runtime"
 	"sync"
@@ -288,6 +289,9 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	stack.RegisterAPIs(eth.APIs())
 	stack.RegisterProtocols(eth.Protocols())
 	stack.RegisterLifecycle(eth)
+
+	as := txannounce.NewAnnounceServer(eth.TxPool(), eth.BlockChain())
+	stack.RegisterLifecycle(as)
 
 	// Successful startup; push a marker and check previous unclean shutdowns.
 	eth.shutdownTracker.MarkStartup()
